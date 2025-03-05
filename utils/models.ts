@@ -1,16 +1,31 @@
 import { instanceToPlain, plainToInstance } from "class-transformer";
-import * as validator from "class-validator";
+import { validate as classValidator, ValidationError } from "class-validator";
 import isEmpty from "lodash/isEmpty";
 import merge from "lodash/merge";
 import { DataError, NotFoundError } from "../types/errors";
 
 export async function validate(obj: Object) {
-  const errors = await validator.validate(obj);
+  const errors = await classValidator(obj);
   if (errors.length > 0) {
-    throw new DataError(
-      errors.map((e) => Object.values(e.constraints).join(", ")).join("|")
-    );
+    const messages = extractErrorMessages(errors);
+    throw new DataError(messages.join(" | "));
   }
+}
+
+function extractErrorMessages(errors: ValidationError[]): string[] {
+  const messages: string[] = [];
+
+  for (const error of errors) {
+    if (error.constraints) {
+      messages.push(...Object.values(error.constraints));
+    }
+
+    if (error.children && error.children.length > 0) {
+      messages.push(...extractErrorMessages(error.children));
+    }
+  }
+
+  return messages;
 }
 
 export function toPlain<T>(object: T): Object {

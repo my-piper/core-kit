@@ -39,7 +39,7 @@ export class TooManyRequestsError extends Error {
   }
 }
 
-export class JobTimeout extends Error {
+export class TimeoutError extends Error {
   constructor(message: string = "Task timeout") {
     super(message);
   }

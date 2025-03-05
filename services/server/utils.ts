@@ -8,6 +8,7 @@ import {
 } from "core-kit/consts/locale";
 import { createLogger } from "core-kit/services/logger/utils";
 import { mysql } from "core-kit/services/mysql";
+import { toInstance, toModel, toPlain } from "core-kit/utils/models";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import assign from "lodash/assign";
@@ -24,7 +25,6 @@ import {
   TooManyRequestsError,
   UnauthorizedError,
 } from "../../types/errors";
-import { toInstance, toModel, toPlain } from "../../utils/models";
 import { NO_CACHE_HEADERS } from "./consts";
 
 const USER_TOKEN_HEADER = "user-token";

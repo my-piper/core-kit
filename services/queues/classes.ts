@@ -1,10 +1,10 @@
 import { Job, JobsOptions, Queue, Worker } from "bullmq";
-import assign from "lodash/assign";
+import { toInstance, toPlain } from "core-kit/utils/models";
 import merge from "lodash/merge";
 import { Logger } from "pino";
-import { toInstance, toPlain } from "../../utils/models";
 import { createLogger } from "../logger/utils";
-import { BULL_REDIS_HOST, JobsQueueOptions } from "./consts";
+import { JobsQueueOptions } from "./consts";
+import connection from "./redis";
 
 export class JobsQueue<T> {
   private logger: Logger = createLogger(this.id);
@@ -24,38 +24,48 @@ export class JobsQueue<T> {
           max: 5,
           duration: 10000,
         },
-        job: {
-          attempts: 12,
-          backoff: 10000,
+        defaultJobOptions: {
+          attempts: 5,
+          backoff: {
+            type: "fixed",
+            delay: 5000,
+          },
         },
       },
       options
     );
-    this.bull = new Queue(id, {
-      connection: {
-        host: BULL_REDIS_HOST,
-      },
-    });
+    const { defaultJobOptions } = this.options;
+    this.bull = new Queue(id, { connection, defaultJobOptions });
   }
 
-  async getPendingCount(): Promise<number> {
+  async getState(): Promise<{ active; delayed; waiting; planned: number }> {
     const { active, delayed, waiting } = await this.bull.getJobCounts();
-    return active + delayed + waiting;
+    return { active, delayed, waiting, planned: active + delayed + waiting };
   }
 
   async plan(data: Partial<T> = {}, options: JobsOptions = {}) {
+    this.logger.debug("Plan new task");
     await this.bull.add(
       "default",
       toPlain(new this.model(data)),
-      assign({}, this.options.job, options)
+      merge({}, this.options.job, options)
     );
   }
 
-  handle(handler: (payload: T, job?: Job) => Promise<any>) {
+  async close() {
+    this.bull.close();
+  }
+
+  process(
+    handler: (payload: T, job?: Job) => Promise<any>,
+    error?: (payload: T, err?: Error, job?: Job) => Promise<void>
+  ) {
+    this.logger.debug("Run worker");
     const { concurrency, limiter } = this.options;
     const worker = new Worker(
       this.id,
       async (job: Job) => {
+        this.logger.debug(`Process jobs ${job.id}`);
         try {
           const { data } = job;
           return await handler(toInstance(data, this.model), job);
@@ -65,16 +75,18 @@ export class JobsQueue<T> {
         }
       },
       {
-        connection: {
-          host: BULL_REDIS_HOST,
-        },
+        connection,
         concurrency,
         limiter,
       }
     );
-    worker.on("failed", (job, err) => {
-      this.logger.error(`Job failed [${job.attemptsMade}]`);
-      this.logger.error(err);
-    });
+    if (!!error) {
+      worker.on("failed", async (job, err) => {
+        this.logger.error(`Job failed [${job.attemptsMade}]`);
+        this.logger.error(err);
+        const { data } = job;
+        await error(toInstance(data, this.model), err, job);
+      });
+    }
   }
 }

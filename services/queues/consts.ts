@@ -7,7 +7,7 @@ export type JobsQueueOptions = {
     max: number;
     duration: number;
   };
-  job?: JobsOptions;
+  defaultJobOptions?: JobsOptions;
   logger?: {
     module: string;
   };

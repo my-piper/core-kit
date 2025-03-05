@@ -1,21 +1,26 @@
-import Pino, { stdTimeFunctions } from "pino";
-import pretty from "pino-pretty";
+import Pino from "pino";
 import { LOG_LEVEL, LOG_PRETTY } from "./consts";
 
 const logger = Pino(
-  {
-    level: LOG_LEVEL,
-    formatters: {
-      bindings: ({ hostname: host }) => ({ host }),
-      level: (label: string) => ({ label }),
-    },
-    timestamp: stdTimeFunctions.isoTime,
-  },
-  LOG_PRETTY ? pretty({ colorize: true }) : undefined
+  LOG_PRETTY
+    ? {
+        level: LOG_LEVEL,
+        transport: {
+          target: "pino-pretty",
+          options: { colorize: true },
+        },
+      }
+    : {
+        level: LOG_LEVEL,
+        formatters: {
+          level: (label: string) => ({ level: label }),
+        },
+      }
 );
 
-export function createLogger(module: string) {
-  return logger.child({
-    name: module,
-  });
+export function createLogger(
+  module: string,
+  opts: { [key: string]: string } = {}
+) {
+  return logger.child({ name: module, ...opts });
 }
