@@ -38,9 +38,24 @@ export class JobsQueue<T> {
     this.bull = new Queue(id, { connection, defaultJobOptions });
   }
 
-  async getState(): Promise<{ active; delayed; waiting; planned: number }> {
-    const { active, delayed, waiting } = await this.bull.getJobCounts();
-    return { active, delayed, waiting, planned: active + delayed + waiting };
+  async getState(): Promise<{
+    active: number;
+    delayed: number;
+    waiting: number;
+    planned: number;
+    completed: number;
+    failed: number;
+  }> {
+    const { active, delayed, waiting, completed, failed } =
+      await this.bull.getJobCounts();
+    return {
+      active,
+      delayed,
+      waiting,
+      planned: active + delayed + waiting,
+      completed,
+      failed,
+    };
   }
 
   async plan(data: Partial<T> = {}, options: JobsOptions = {}) {
@@ -48,7 +63,7 @@ export class JobsQueue<T> {
     await this.bull.add(
       "default",
       toPlain(new this.model(data)),
-      merge({}, this.options.job, options)
+      merge({}, this.options.defaultJobOptions, options)
     );
   }
 
