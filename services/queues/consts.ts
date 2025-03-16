@@ -1,3 +1,5 @@
+import "../../env";
+
 import { JobsOptions } from "bullmq";
 
 export const BULL_REDIS_HOST = process.env["BULL_REDIS_HOST"] || "redis";

@@ -1,3 +1,5 @@
+import "../../env";
+
 export const MYSQL_HOST = process.env["MYSQL_HOST"] || "mysql";
 export const MYSQL_USER = process.env["MYSQL_USER"] || "billing";
 export const MYSQL_PASSWORD = process.env["MYSQL_PASSWORD"] || "xyzXYZ";

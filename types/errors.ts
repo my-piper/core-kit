@@ -1,3 +1,5 @@
+import { Expose, Type } from "class-transformer";
+
 export class FatalError extends Error {
   constructor(message: string = "Fatal error") {
     super(message);
@@ -16,8 +18,13 @@ export class PenTestingError extends Error {
 }
 
 export class DataError extends Error {
-  constructor(message: string = "Data error") {
+  @Expose()
+  @Type(() => Object)
+  details: object | object[];
+
+  constructor(message: string = "Data error", details: object = {}) {
     super(message);
+    this.details = details;
   }
 }
 

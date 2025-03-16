@@ -1,8 +1,8 @@
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import { validate as classValidator, ValidationError } from "class-validator";
+import { DataError, NotFoundError } from "core-kit/types/errors";
 import isEmpty from "lodash/isEmpty";
 import merge from "lodash/merge";
-import { DataError, NotFoundError } from "../types/errors";
 
 export async function validate(obj: Object) {
   const errors = await classValidator(obj);
