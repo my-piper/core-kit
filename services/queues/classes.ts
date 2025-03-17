@@ -1,4 +1,4 @@
-import { Job, JobsOptions, Queue, Worker } from "bullmq";
+import { Job, JobsOptions, MetricsTime, Queue, Worker } from "bullmq";
 import { toInstance, toPlain } from "core-kit/utils/models";
 import merge from "lodash/merge";
 import { Logger } from "pino";
@@ -30,6 +30,8 @@ export class JobsQueue<T> {
             type: "fixed",
             delay: 5000,
           },
+          removeOnComplete: 1000,
+          removeOnFail: 5000,
         },
       },
       options
@@ -60,15 +62,15 @@ export class JobsQueue<T> {
 
   async plan(data: Partial<T> = {}, options: JobsOptions = {}) {
     this.logger.debug("Plan new task");
-    await this.bull.add(
-      "default",
-      toPlain(new this.model(data)),
-      merge({}, this.options.defaultJobOptions, options)
-    );
+    await this.bull.add("default", toPlain(new this.model(data)), options);
   }
 
   async close() {
     this.bull.close();
+  }
+
+  async metrics(): Promise<string> {
+    return this.bull.exportPrometheusMetrics();
   }
 
   process(
@@ -93,6 +95,9 @@ export class JobsQueue<T> {
         connection,
         concurrency,
         limiter,
+        metrics: {
+          maxDataPoints: MetricsTime.ONE_HOUR,
+        },
       }
     );
     if (!!error) {
