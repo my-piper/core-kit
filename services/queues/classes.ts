@@ -11,6 +11,7 @@ export class JobsQueue<T> {
 
   private bull: Queue;
   private options: JobsQueueOptions;
+  private workers: Worker[] = [];
 
   constructor(
     private id: string,
@@ -66,7 +67,12 @@ export class JobsQueue<T> {
   }
 
   async close() {
-    this.bull.close();
+    this.logger.debug("Closing workers");
+    await Promise.all(this.workers.map((w) => w.close()));
+    this.logger.debug("Workers are closed");
+    this.logger.debug("Closing queue");
+    await this.bull.close();
+    this.logger.debug("Queue is closed");
   }
 
   async metrics(): Promise<string> {
@@ -108,5 +114,7 @@ export class JobsQueue<T> {
         await error(toInstance(data, this.model), err, job);
       });
     }
+
+    this.workers.push(worker);
   }
 }
