@@ -1,35 +1,46 @@
-import { Job, JobsOptions, MetricsTime, Queue, Worker } from "bullmq";
+import {
+  JobsOptions as BullJobsOptions,
+  Job,
+  MetricsTime,
+  Queue,
+  Worker,
+} from "bullmq";
 import { toInstance, toPlain } from "core-kit/utils/models";
+import { secondsToMilliseconds } from "date-fns";
+import minutesToMilliseconds from "date-fns/minutesToMilliseconds";
 import merge from "lodash/merge";
 import { Logger } from "pino";
 import { createLogger } from "../logger/utils";
-import { JobsQueueOptions } from "./consts";
+import { JobsQueueOptions as QueueOptions } from "./consts";
 import connection from "./redis";
+
+export type JobsOptions = BullJobsOptions;
 
 export class JobsQueue<T> {
   private logger: Logger = createLogger(this.id);
 
   private bull: Queue;
-  private options: JobsQueueOptions;
+  private options: QueueOptions;
   private workers: Worker[] = [];
 
   constructor(
     private id: string,
     private model: new (defs?: Partial<T>) => T,
-    options: JobsQueueOptions = {}
+    options: QueueOptions = {}
   ) {
     this.options = merge(
       {
         concurrency: 1,
+        timeout: minutesToMilliseconds(5),
         limiter: {
           max: 5,
-          duration: 10000,
+          duration: secondsToMilliseconds(10),
         },
         defaultJobOptions: {
           attempts: 5,
           backoff: {
             type: "fixed",
-            delay: 5000,
+            delay: secondsToMilliseconds(5),
           },
           removeOnComplete: 1000,
           removeOnFail: 5000,
@@ -62,8 +73,13 @@ export class JobsQueue<T> {
   }
 
   async plan(data: Partial<T> = {}, options: JobsOptions = {}) {
-    this.logger.debug("Plan new task");
-    await this.bull.add("default", toPlain(new this.model(data)), options);
+    const { timeout } = this.options;
+    this.logger.debug(`Plan new task in ${timeout} timeout`);
+    await this.bull.add(
+      "default",
+      toPlain(new this.model(data)),
+      merge({ timeout }, options)
+    );
   }
 
   async close() {
@@ -84,7 +100,7 @@ export class JobsQueue<T> {
     error?: (payload: T, err?: Error, job?: Job) => Promise<void>
   ) {
     this.logger.debug("Run worker");
-    const { concurrency, limiter } = this.options;
+    const { concurrency, limiter, timeout } = this.options;
     const worker = new Worker(
       this.id,
       async (job: Job) => {
