@@ -74,7 +74,7 @@ export class JobsQueue<T> {
 
   async plan(data: Partial<T> = {}, options: JobsOptions = {}) {
     const { timeout } = this.options;
-    this.logger.debug(`Plan new task in ${timeout} timeout`);
+    this.logger.debug(`Plan new task with ${timeout / 1000}ms timeout`);
     await this.bull.add(
       "default",
       toPlain(new this.model(data)),
@@ -83,7 +83,7 @@ export class JobsQueue<T> {
   }
 
   async close() {
-    this.logger.debug("Closing workers");
+    this.logger.debug("Closing queue workers");
     await Promise.all(this.workers.map((w) => w.close()));
     this.logger.debug("Workers are closed");
     this.logger.debug("Closing queue");
@@ -99,12 +99,12 @@ export class JobsQueue<T> {
     handler: (payload: T, job?: Job) => Promise<any>,
     error?: (payload: T, err?: Error, job?: Job) => Promise<void>
   ) {
-    this.logger.debug("Run worker");
-    const { concurrency, limiter, timeout } = this.options;
+    this.logger.debug("Run queue worker");
+    const { concurrency, limiter } = this.options;
     const worker = new Worker(
       this.id,
       async (job: Job) => {
-        this.logger.debug(`Process jobs ${job.id}`);
+        this.logger.debug(`Process job ${job.id}`);
         try {
           const { data } = job;
           return await handler(toInstance(data, this.model), job);
