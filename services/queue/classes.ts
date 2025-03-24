@@ -11,6 +11,7 @@ import minutesToMilliseconds from "date-fns/minutesToMilliseconds";
 import merge from "lodash/merge";
 import { Logger } from "pino";
 import { createLogger } from "../logger/utils";
+import sentry from "../sentry";
 import { JobsQueueOptions as QueueOptions } from "./consts";
 import connection from "./redis";
 
@@ -74,7 +75,7 @@ export class JobsQueue<T> {
 
   async plan(data: Partial<T> = {}, options: JobsOptions = {}) {
     const { timeout } = this.options;
-    this.logger.debug(`Plan new task with ${timeout / 1000}ms timeout`);
+    this.logger.debug(`Plan new task with ${timeout / 1000}s timeout`);
     await this.bull.add(
       "default",
       toPlain(new this.model(data)),
@@ -122,14 +123,15 @@ export class JobsQueue<T> {
         },
       }
     );
-    if (!!error) {
-      worker.on("failed", async (job, err) => {
-        this.logger.error(`Job failed [${job.attemptsMade}]`);
-        this.logger.error(err);
+    worker.on("failed", async (job, err) => {
+      sentry.captureException(err);
+      this.logger.error(`Job failed [${job.attemptsMade}]`);
+      this.logger.error(err);
+      if (!!error) {
         const { data } = job;
         await error(toInstance(data, this.model), err, job);
-      });
-    }
+      }
+    });
 
     this.workers.push(worker);
   }
