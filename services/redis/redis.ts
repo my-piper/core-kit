@@ -1,5 +1,6 @@
 import { createClient } from "@redis/client";
 import { createLogger } from "../logger";
+import sentry from "../sentry";
 import { REDIS_PASSWORD, REDIS_URL } from "./consts";
 
 const logger = createLogger("redis");
@@ -10,6 +11,7 @@ await redis.connect();
 
 redis.on("error", (err: { code?: string; message: string }) => {
   logger.error(`Redis error: ${err.message}`);
+  sentry.captureException(err);
   if (
     err.code === "ECONNREFUSED" ||
     err.code === "EHOSTUNREACH" ||
