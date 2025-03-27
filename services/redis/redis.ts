@@ -6,7 +6,7 @@ import { REDIS_PASSWORD, REDIS_URL } from "./consts";
 const logger = createLogger("redis");
 
 export const redis = createClient({ url: REDIS_URL, password: REDIS_PASSWORD });
-logger.error(`Connect to redis ${REDIS_URL}`);
+logger.info(`Connect to redis ${REDIS_URL}`);
 await redis.connect();
 
 redis.on("error", (err: { code?: string; message: string }) => {
