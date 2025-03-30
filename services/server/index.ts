@@ -1,3 +1,4 @@
-export * from "./api";
+import server from "./server";
 export * from "./consts";
-export * from "./utils";
+
+export default server;
