@@ -6,8 +6,7 @@ import {
   Worker,
 } from "bullmq";
 import { toInstance, toPlain } from "core-kit/utils/models";
-import { secondsToMilliseconds } from "date-fns";
-import minutesToMilliseconds from "date-fns/minutesToMilliseconds";
+import { minutesToMilliseconds, secondsToMilliseconds } from "date-fns";
 import merge from "lodash/merge";
 import { Logger } from "pino";
 import { createLogger } from "../logger/utils";

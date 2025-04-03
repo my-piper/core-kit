@@ -1,8 +1,8 @@
-import "../../env";
+import env from "core-kit/env";
 
 import { JobsOptions } from "bullmq";
 
-export const BULL_REDIS_HOST = process.env["BULL_REDIS_HOST"] || "redis";
+export const BULL_REDIS_HOST = env["BULL_REDIS_HOST"] || "redis";
 export type JobsQueueOptions = {
   concurrency?: number;
   timeout?: number;

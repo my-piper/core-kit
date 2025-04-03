@@ -12,14 +12,20 @@ const redis = new Redis({
   maxRetriesPerRequest: null,
 });
 
+let rip = false;
+
 redis.on("error", (err: { code?: string; message: string }) => {
-  logger.error(`Redis error: ${err.message}`);
+  console.error(`Redis error: ${err.message}`);
   if (
     err.code === "ECONNREFUSED" ||
     err.code === "EHOSTUNREACH" ||
     err.code === "ENOTFOUND"
   ) {
-    process.kill(process.pid, "SIGINT");
+    if (!rip) {
+      console.log("Killing app");
+      process.kill(process.pid, "SIGKILL");
+      rip = true;
+    }
   }
 });
 

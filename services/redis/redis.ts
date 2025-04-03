@@ -9,14 +9,20 @@ export const redis = createClient({ url: REDIS_URL, password: REDIS_PASSWORD });
 logger.info(`Connect to redis ${REDIS_URL}`);
 await redis.connect();
 
+let rip = false;
+
 redis.on("error", (err: { code?: string; message: string }) => {
-  logger.error(`Redis error: ${err.message}`);
+  console.error(`Redis error: ${err.message}`);
   sentry.captureException(err);
   if (
     err.code === "ECONNREFUSED" ||
     err.code === "EHOSTUNREACH" ||
     err.code === "ENOTFOUND"
   ) {
-    process.kill(process.pid, "SIGINT");
+    if (!rip) {
+      console.log("Killing app");
+      process.kill(process.pid, "SIGKILL");
+      rip = true;
+    }
   }
 });
