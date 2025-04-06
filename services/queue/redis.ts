@@ -1,14 +1,14 @@
+import { createLogger } from "core-kit/services/logger";
 import { Redis } from "ioredis";
-import { createLogger } from "../logger";
-import { BULL_REDIS_HOST } from "./consts";
+import { BULL_REDIS_DB, BULL_REDIS_HOST, BULL_REDIS_PORT } from "./consts";
 
 const logger = createLogger("queues");
 logger.info(`Connect to redis ${BULL_REDIS_HOST}`);
 
 const redis = new Redis({
   host: BULL_REDIS_HOST,
-  port: 6379,
-  db: 5,
+  port: BULL_REDIS_PORT,
+  db: BULL_REDIS_DB,
   maxRetriesPerRequest: null,
 });
 

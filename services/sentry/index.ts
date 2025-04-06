@@ -1,5 +1,5 @@
 import * as sentry from "@sentry/node";
-import { createLogger } from "../logger";
+import { createLogger } from "core-kit/services/logger";
 import { SENTRY_DSN } from "./consts";
 
 const logger = createLogger("sentry");
