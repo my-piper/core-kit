@@ -4,8 +4,8 @@ import express from "express";
 
 const server = express();
 server.use(bodyParser.text());
-server.use(bodyParser.json({ limit: "500kb" }));
-server.use(bodyParser.urlencoded({ extended: false, limit: "15mb" }));
+server.use(bodyParser.json({ limit: "2mb" }));
+server.use(bodyParser.urlencoded({ extended: false, limit: "25mb" }));
 server.use(cookieParser());
 
 server.get("/health", (req, res) => {
