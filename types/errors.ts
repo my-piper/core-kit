@@ -1,4 +1,4 @@
-import { Expose, Type } from "class-transformer";
+import { Expose, Type } from "../packages/transform";
 
 export class FatalError extends Error {
   constructor(message: string = "Fatal error") {
