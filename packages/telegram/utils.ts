@@ -10,7 +10,11 @@ export async function fileUrl(id: string) {
   return `${TELEGRAM_BOT_FILE_URL}/${file_path}`;
 }
 
-export function progress(current: number, total: number): string {
+export function progress(current: number, total: number = 100): string {
+  if (current === -1) {
+    [current, total] = [100, 100];
+  }
+
   const MAX_LENGTH = 10;
 
   const percent = Math.ceil((current / total) * 100);

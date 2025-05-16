@@ -1,6 +1,6 @@
 import trim from "lodash/trim";
 import { parse } from "qs";
-import { Languages } from "../locale";
+import { ALL_LANGUAGES, DEFAULT_LANGUAGE, Languages } from "../locale";
 import i18n from "./i18n";
 
 export type Labels = { [Languages.en]: string } & {
@@ -18,6 +18,11 @@ export function allLabels(source: string): Labels {
 export function getLabel(source: string, language: Languages): string {
   const labels = allLabels(source);
   return trim(labels[language] || labels[Languages.en]);
+}
+
+export function detect(code: string): Languages {
+  const language = code as Languages;
+  return ALL_LANGUAGES.includes(language) ? language : DEFAULT_LANGUAGE;
 }
 
 const i18ns = new Map<string, typeof i18n>();
