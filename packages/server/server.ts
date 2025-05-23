@@ -11,9 +11,9 @@ server.use(
       req: Request,
       res: Response,
       data: Buffer,
-      encoding: BufferEncoding
+      encoding: BufferEncoding,
     ) => (req.rawBody = data),
-  })
+  }),
 );
 server.use(bodyParser.urlencoded({ extended: false, limit: "25mb" }));
 server.use(cookieParser());

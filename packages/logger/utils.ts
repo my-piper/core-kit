@@ -15,12 +15,12 @@ const logger = Pino(
         formatters: {
           level: (label: string) => ({ level: label }),
         },
-      }
+      },
 );
 
 export function createLogger(
   module: string,
-  opts: { [key: string]: string } = {}
+  opts: { [key: string]: string } = {},
 ) {
   return logger.child({ name: module, ...opts });
 }

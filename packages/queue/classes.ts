@@ -26,7 +26,7 @@ export class JobsQueue<T> {
   constructor(
     private id: string,
     private model: new (defs?: Partial<T>) => T,
-    options: QueueOptions = {}
+    options: QueueOptions = {},
   ) {
     this.options = merge(
       {
@@ -46,7 +46,7 @@ export class JobsQueue<T> {
           removeOnFail: 5000,
         },
       },
-      options
+      options,
     );
     const { defaultJobOptions } = this.options;
     this.bull = new Queue(id, { connection, defaultJobOptions });
@@ -78,7 +78,7 @@ export class JobsQueue<T> {
     await this.bull.add(
       "default",
       toPlain(new this.model(data)),
-      merge({ timeout }, options)
+      merge({ timeout }, options),
     );
   }
 
@@ -97,7 +97,7 @@ export class JobsQueue<T> {
 
   process(
     handler: (payload: T, job?: Job) => Promise<any>,
-    error?: (payload: T, err?: Error, job?: Job) => Promise<void>
+    error?: (payload: T, err?: Error, job?: Job) => Promise<void>,
   ) {
     this.logger.debug("Run queue worker");
     const { concurrency, limiter } = this.options;
@@ -120,7 +120,7 @@ export class JobsQueue<T> {
         metrics: {
           maxDataPoints: MetricsTime.ONE_HOUR,
         },
-      }
+      },
     );
     worker.on("failed", async (job, err) => {
       sentry.captureException(err);

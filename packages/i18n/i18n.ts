@@ -47,7 +47,15 @@ i18n.use({
       const filePath = path.join("locales", lang, fileName);
       logger.debug(`Read text from file ${filePath}`);
       try {
-        return readFileSync(filePath, "utf-8");
+        const fileContent = readFileSync(filePath, "utf-8");
+        const interpolated = i18n.services.interpolator.interpolate(
+          fileContent,
+          options,
+          lang,
+          {},
+        );
+
+        return interpolated;
       } catch (err) {
         logger.warn("Failed to load file for key");
       }
