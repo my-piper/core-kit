@@ -43,15 +43,14 @@ i18n.use({
     logger.debug(`Resolve key ${key} with value ${value}`);
     if (typeof value === "string" && value.startsWith(FILE_REF_PATTERN)) {
       const fileName = value.replace(FILE_REF_PATTERN, "").trim();
-      const lang = translator.language;
-      const filePath = path.join("locales", lang, fileName);
+      const filePath = path.join("locales", fileName);
       logger.debug(`Read text from file ${filePath}`);
       try {
         const fileContent = readFileSync(filePath, "utf-8");
         const interpolated = i18n.services.interpolator.interpolate(
           fileContent,
           options,
-          lang,
+          translator.language,
           {},
         );
 

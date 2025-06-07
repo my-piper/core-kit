@@ -1,8 +1,30 @@
+import env from "../../env";
 import { Countries, Currencies, Languages } from "./enums";
 
 export const DEFAULT_CURRENCY = Currencies.usd;
 export const DEFAULT_COUNTRY = Countries.us;
-export const DEFAULT_LANGUAGE = Languages.en;
+
+export const ALL_LANGUAGES = [
+  Languages.en,
+  Languages.ru,
+  Languages.de,
+  Languages.es,
+  Languages.ptBR,
+  Languages.fr,
+  Languages.ja,
+  Languages.ko,
+  Languages.zhCN,
+  Languages.zhTW,
+  Languages.hi,
+  Languages.tr,
+  Languages.it,
+];
+export const DEFAULT_LANGUAGE = (() => {
+  const language = (env["DEFAULT_LANGUAGE"] as Languages) || null;
+  return !!language && ALL_LANGUAGES.includes(language)
+    ? language
+    : Languages.en;
+})();
 export const ALL_CURRENCIES = [
   Currencies.usd,
   Currencies.eur,
@@ -45,20 +67,4 @@ export const ALL_CURRENCIES = [
   Currencies.uyu,
   Currencies.vnd,
   Currencies.zmw,
-];
-
-export const ALL_LANGUAGES = [
-  Languages.en,
-  Languages.ru,
-  Languages.de,
-  Languages.es,
-  Languages.ptBR,
-  Languages.fr,
-  Languages.ja,
-  Languages.ko,
-  Languages.zhCN,
-  Languages.zhTW,
-  Languages.hi,
-  Languages.tr,
-  Languages.it,
 ];
