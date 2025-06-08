@@ -3,21 +3,21 @@ import { parse } from "qs";
 import { ALL_LANGUAGES, DEFAULT_LANGUAGE, Languages } from "../locale";
 import i18n from "./i18n";
 
-export type Labels = { [Languages.en]: string } & {
+export type Labels = { [DEFAULT_LANGUAGE]: string } & {
   [key in Languages]?: string;
 };
 
 export function allLabels(source: string): Labels {
   const labels = parse(source, { delimiter: ";" });
-  if (Languages.en in labels) {
+  if (DEFAULT_LANGUAGE in labels) {
     return labels as Labels;
   }
-  return { [Languages.en]: source };
+  return { [DEFAULT_LANGUAGE]: source };
 }
 
 export function getLabel(source: string, language: Languages): string {
   const labels = allLabels(source);
-  return trim(labels[language] || labels[Languages.en]);
+  return trim(labels[language] || labels[DEFAULT_LANGUAGE]);
 }
 
 export function detect(code: string): Languages {
