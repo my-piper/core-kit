@@ -10,6 +10,10 @@ export async function lock(
   await redis.setEx(key, expired, "x");
 }
 
+export async function remove(key: string): Promise<void> {
+  await redis.del(key);
+}
+
 export async function unlock(key: string): Promise<void> {
   await redis.del(key);
 }

@@ -5,7 +5,7 @@ import {
   Queue,
   Worker,
 } from "bullmq";
-import { toInstance, toPlain } from "core-kit/packages/transform";
+import { mapTo, toInstance } from "core-kit/packages/transform";
 import { minutesToMilliseconds, secondsToMilliseconds } from "date-fns";
 import merge from "lodash/merge";
 import { Logger } from "pino";
@@ -52,6 +52,10 @@ export class JobsQueue<T> {
     this.bull = new Queue(id, { connection, defaultJobOptions });
   }
 
+  async getJobState(id: string) {
+    return this.bull.getJobState(id);
+  }
+
   async getState(): Promise<{
     active: number;
     delayed: number;
@@ -74,12 +78,12 @@ export class JobsQueue<T> {
 
   async plan(data: Partial<T> = {}, options: JobsOptions = {}) {
     const { timeout } = this.options;
-    this.logger.debug(`Plan new task with ${timeout / 1000}s timeout`);
-    await this.bull.add(
-      "default",
-      toPlain(new this.model(data)),
-      merge({ timeout }, options),
+    this.logger.debug(
+      `Plan new task ${this.id} with ${timeout / 1000}s timeout`,
     );
+    const payload = mapTo(data, this.model);
+    this.logger.debug(JSON.stringify(payload));
+    return await this.bull.add("default", payload, merge({ timeout }, options));
   }
 
   async close() {
