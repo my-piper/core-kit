@@ -43,11 +43,17 @@ export function toInstance<T>(object: object, cls: new () => T): T {
 }
 
 export function mapTo<T>(object: object, cls: new () => T): T {
-  return plainToInstance(cls, object, {
+  const plain = instanceToPlain(object, {
+    exposeUnsetFields: false,
+    enableCircularCheck: true,
+  });
+
+  return plainToInstance(cls, plain, {
     excludeExtraneousValues: true,
     exposeUnsetFields: false,
   });
 }
+
 export function toModels<T>(arr: Object[], model: new () => T): T[] {
   return arr.map((o) => toInstance(nestedKeys(o) || {}, model));
 }
