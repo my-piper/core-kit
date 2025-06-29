@@ -5,7 +5,7 @@ import {
   Queue,
   Worker,
 } from "bullmq";
-import { mapTo, toInstance } from "core-kit/packages/transform";
+import { mapTo, toInstance, toPlain } from "core-kit/packages/transform";
 import { minutesToMilliseconds, secondsToMilliseconds } from "date-fns";
 import merge from "lodash/merge";
 import { Logger } from "pino";
@@ -26,7 +26,7 @@ export class JobsQueue<T> {
   constructor(
     private id: string,
     private model: new (defs?: Partial<T>) => T,
-    options: QueueOptions = {},
+    options: QueueOptions = {}
   ) {
     this.options = merge(
       {
@@ -46,7 +46,7 @@ export class JobsQueue<T> {
           removeOnFail: 5000,
         },
       },
-      options,
+      options
     );
     const { defaultJobOptions } = this.options;
     this.bull = new Queue(id, { connection, defaultJobOptions });
@@ -79,9 +79,9 @@ export class JobsQueue<T> {
   async plan(data: Partial<T> = {}, options: JobsOptions = {}) {
     const { timeout } = this.options;
     this.logger.debug(
-      `Plan new task ${this.id} with ${timeout / 1000}s timeout`,
+      `Plan new task ${this.id} with ${timeout / 1000}s timeout`
     );
-    const payload = mapTo(data, this.model);
+    const payload = toPlain(mapTo(data, this.model));
     this.logger.debug(JSON.stringify(payload));
     return await this.bull.add("default", payload, merge({ timeout }, options));
   }
@@ -101,7 +101,7 @@ export class JobsQueue<T> {
 
   process(
     handler: (payload: T, job?: Job) => Promise<any>,
-    error?: (payload: T, err?: Error, job?: Job) => Promise<void>,
+    error?: (payload: T, err?: Error, job?: Job) => Promise<void>
   ) {
     this.logger.debug("Run queue worker");
     const { concurrency, limiter } = this.options;
@@ -124,7 +124,7 @@ export class JobsQueue<T> {
         metrics: {
           maxDataPoints: MetricsTime.ONE_HOUR,
         },
-      },
+      }
     );
     worker.on("failed", async (job, err) => {
       sentry.captureException(err);
