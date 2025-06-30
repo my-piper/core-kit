@@ -1,4 +1,5 @@
-import { Expose, Type } from "../packages/transform";
+import { objectTransformer } from "transformers/object";
+import { Expose, Transform } from "../packages/transform";
 
 export class FatalError extends Error {
   constructor(message: string = "Fatal error") {
@@ -19,7 +20,7 @@ export class PenTestingError extends Error {
 
 export class DataError extends Error {
   @Expose()
-  @Type(() => Object)
+  @Transform(objectTransformer)
   details: object | object[];
 
   constructor(message: string = "Data error", details: object = {}) {
