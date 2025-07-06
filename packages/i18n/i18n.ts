@@ -3,6 +3,7 @@ import i18next, { BackendModule, ReadCallback } from "i18next";
 import path from "path";
 import { ALL_LANGUAGES, DEFAULT_LANGUAGE } from "../locale/consts";
 import { createLogger } from "../logger";
+import hb from "../templates/handlebars";
 
 const logger = createLogger("i18n");
 logger.level = "info";
@@ -46,16 +47,10 @@ i18n.use({
       const filePath = path.join("locales", fileName);
       logger.debug(`Read text from file ${filePath}`);
       try {
-        const fileContent = readFileSync(filePath, "utf-8");
-        const interpolated = i18n.services.interpolator.interpolate(
-          fileContent,
-          options,
-          translator.language,
-          {},
-        );
-
-        return interpolated;
+        const content = readFileSync(filePath, "utf-8");
+        return hb.compile(content)(options);
       } catch (err) {
+        logger.error(err);
         logger.warn("Failed to load file for key");
       }
     }

@@ -1,6 +1,6 @@
-import hb from "handlebars";
 import * as marked from "marked";
 import { Languages } from "../locale/enums";
+import hb from "./handlebars";
 const { compile } = hb;
 
 const SPLIT_REGEX = /---\s*(\w+)\s*---\s*\n/g;
