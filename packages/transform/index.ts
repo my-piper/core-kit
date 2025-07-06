@@ -11,5 +11,6 @@ export {
   MinLength,
   ValidateNested,
 } from "class-validator";
+export * from "./object";
 export * from "./primitive";
 export * from "./utils";

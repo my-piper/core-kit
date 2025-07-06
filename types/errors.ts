@@ -1,5 +1,4 @@
-import { objectTransformer } from "transformers/object";
-import { Expose, Transform } from "../packages/transform";
+import { Expose, objectTransformer, Transform } from "../packages/transform";
 
 export class FatalError extends Error {
   constructor(message: string = "Fatal error") {
