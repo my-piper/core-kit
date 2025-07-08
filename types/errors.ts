@@ -5,6 +5,7 @@ export class FatalError extends Error {
     super(message);
   }
 }
+
 export class UnknownError extends Error {
   constructor(message: string = "Unknown error") {
     super(message);

@@ -42,7 +42,7 @@ export function toInstance<T>(object: object, cls: new () => T): T {
   });
 }
 
-export function mapTo<T>(object: object, cls: new () => T): T {
+export function mapTo<T>(object: Partial<T>, cls: new () => T): T {
   const plain = instanceToPlain(object, {
     exposeUnsetFields: false,
     enableCircularCheck: true,

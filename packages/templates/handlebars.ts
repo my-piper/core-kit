@@ -5,6 +5,8 @@ hb.registerHelper("currency", function (value: number, currency: Currencies) {
   switch (currency) {
     case Currencies.rub:
       return `${value}₽`;
+    case Currencies.eur:
+      return `€${value}`;
     case Currencies.usd:
     default:
       return `$${value}`;
