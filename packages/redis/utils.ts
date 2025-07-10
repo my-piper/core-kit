@@ -1,3 +1,4 @@
+import { Primitive } from "types/primitive";
 import { toInstance, toPlain } from "../transform/utils";
 import redis from "./redis";
 
@@ -47,5 +48,49 @@ export async function saveInstance<T>(
     await redis.setEx(key, expiration, JSON.stringify(toPlain(data)));
   } else {
     await redis.set(key, JSON.stringify(toPlain(data)));
+  }
+}
+
+const cache = new Map<string, string>();
+
+const normalize = (value: Primitive): string => {
+  if (typeof value === "number") {
+    return Number.isFinite(value)
+      ? value.toPrecision(20).replace(/\.?0+$/, "")
+      : String(value);
+  }
+  return String(value);
+};
+
+export async function evalScript(
+  script: string,
+  keys: string[] = [],
+  args: Primitive[] = []
+): Promise<any> {
+  if (!cache.has(script)) {
+    const sha = await redis.scriptLoad(script);
+    cache.set(script, sha);
+  }
+
+  const sha = cache.get(script)!;
+
+  try {
+    return await redis.evalSha(sha, {
+      keys,
+      arguments: args.map(normalize),
+    });
+  } catch (err: any) {
+    if (err?.message?.includes("NOSCRIPT")) {
+      const result = await redis.eval(script, {
+        keys,
+        arguments: args.map(normalize),
+      });
+
+      const hash = await redis.scriptLoad(script);
+      cache.set(script, hash);
+      return result;
+    }
+
+    throw err;
   }
 }
