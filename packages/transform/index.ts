@@ -13,4 +13,5 @@ export {
 } from "class-validator";
 export * from "./object";
 export * from "./primitive";
+export * from "./date";
 export * from "./utils";
