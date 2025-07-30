@@ -52,11 +52,13 @@ type DeepPartial<T> = {
 
 export function mapTo<T>(object: DeepPartial<T>, cls: new () => T): T {
   const plain = instanceToPlain(object, {
+    ignoreDecorators: true,
     exposeUnsetFields: false,
     enableCircularCheck: true,
   });
 
   return plainToInstance(cls, plain, {
+    ignoreDecorators: true,
     excludeExtraneousValues: true,
     exposeUnsetFields: false,
   });

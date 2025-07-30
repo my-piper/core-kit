@@ -11,7 +11,8 @@ export {
   MinLength,
   ValidateNested,
 } from "class-validator";
+export * from "./array";
+export * from "./date";
 export * from "./object";
 export * from "./primitive";
-export * from "./date";
 export * from "./utils";
