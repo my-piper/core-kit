@@ -42,15 +42,7 @@ export function toInstance<T>(object: object, cls: new () => T): T {
   });
 }
 
-type DeepPartial<T> = {
-  [P in keyof T]?: T[P] extends object
-    ? T[P] extends Function
-      ? T[P]
-      : DeepPartial<T[P]>
-    : T[P];
-};
-
-export function mapTo<T>(object: DeepPartial<T>, cls: new () => T): T {
+export function mapTo<T>(object: object, cls: new () => T): T {
   const plain = instanceToPlain(object, {
     ignoreDecorators: true,
     exposeUnsetFields: false,
