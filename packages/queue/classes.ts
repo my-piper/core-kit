@@ -52,6 +52,10 @@ export class JobsQueue<T> {
     this.bull = new Queue(id, { connection, defaultJobOptions });
   }
 
+  async getJob(id: string) {
+    return this.bull.getJob(id);
+  }
+
   async getJobState(id: string) {
     return this.bull.getJobState(id);
   }
