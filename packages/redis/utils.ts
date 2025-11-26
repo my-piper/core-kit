@@ -4,6 +4,16 @@ import redis from "./redis";
 
 const DEFAULT_LOCK_EX = 60;
 
+export async function setValue(
+  key: string,
+  value: string,
+  expire: number = null
+): Promise<void> {
+  !!expire
+    ? await redis.setEx(key, expire, value)
+    : await redis.set(key, value);
+}
+
 export async function lock(
   key: string,
   expired: number = DEFAULT_LOCK_EX
@@ -21,6 +31,10 @@ export async function unlock(key: string): Promise<void> {
 
 export async function locked(key: string): Promise<boolean> {
   return !!(await redis.GET(key));
+}
+
+export async function exists(key: string): Promise<boolean> {
+  return (await redis.EXISTS(key)) > 0;
 }
 
 export async function increment(key: string): Promise<number> {
