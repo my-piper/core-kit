@@ -5,11 +5,14 @@ export function objectTransformer({
   value,
   type,
 }: {
-  value: object | string;
+  value: object | string | null;
   type: TransformationType;
 }) {
   switch (type) {
     case TransformationType.PLAIN_TO_CLASS: {
+      if (!value) {
+        return null;
+      }
       return typeof value === "string"
         ? JSON.parse(value as string)
         : (value as object);
