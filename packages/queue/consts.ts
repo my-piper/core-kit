@@ -1,7 +1,5 @@
 import env from "core-kit/env";
 
-import { JobsOptions } from "bullmq";
-
 export const BULL_REDIS_HOST = env["BULL_REDIS_HOST"] || "redis";
 export const BULL_REDIS_PORT =
   (() => {
@@ -19,16 +17,3 @@ export const BULL_REDIS_DB =
     }
     return 0;
   })() || 5;
-
-export type JobsQueueOptions = {
-  concurrency?: number;
-  timeout?: number;
-  limiter?: {
-    max: number;
-    duration: number;
-  };
-  defaultJobOptions?: JobsOptions;
-  logger?: {
-    module: string;
-  };
-};

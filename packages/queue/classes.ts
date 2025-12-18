@@ -11,8 +11,8 @@ import merge from "lodash/merge";
 import { Logger } from "pino";
 import { createLogger } from "../logger/utils";
 import sentry from "../sentry";
-import { JobsQueueOptions as QueueOptions } from "./consts";
 import connection from "./redis";
+import { JobsQueueOptions as QueueOptions } from "./types";
 
 export type JobsOptions = BullJobsOptions;
 
