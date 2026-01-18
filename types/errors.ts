@@ -1,14 +1,23 @@
 import { Expose, objectTransformer, Transform } from "../packages/transform";
 
-export class FatalError extends Error {
-  constructor(message: string = "Fatal error") {
+export class MemoryLimitError extends Error {
+  constructor(message: string = "Memory limit exceeded", stack?: string) {
     super(message);
+    this.stack = stack;
+  }
+}
+
+export class FatalError extends Error {
+  constructor(message: string = "Fatal error", stack?: string) {
+    super(message);
+    this.stack = stack;
   }
 }
 
 export class UnknownError extends Error {
-  constructor(message: string = "Unknown error") {
+  constructor(message: string = "Unknown error", stack?: string) {
     super(message);
+    this.stack = stack;
   }
 }
 
@@ -23,9 +32,14 @@ export class DataError extends Error {
   @Transform(objectTransformer)
   details: object | object[];
 
-  constructor(message: string = "Data error", details: object = {}) {
+  constructor(
+    message: string = "Data error",
+    details: object = {},
+    stack?: string
+  ) {
     super(message);
     this.details = details;
+    this.stack = stack;
   }
 }
 
@@ -48,8 +62,9 @@ export class TooManyRequestsError extends Error {
 }
 
 export class TimeoutError extends Error {
-  constructor(message: string = "Task timeout") {
+  constructor(message: string = "Task timeout", stack?: string) {
     super(message);
+    this.stack = stack;
   }
 }
 

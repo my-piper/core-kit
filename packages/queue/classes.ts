@@ -1,5 +1,6 @@
 import {
   JobsOptions as BullJobsOptions,
+  DelayedError,
   Job,
   MetricsTime,
   Queue,
@@ -117,6 +118,10 @@ export class JobsQueue<T> {
           const { data } = job;
           return await handler(toInstance(data, this.model), job);
         } catch (err) {
+          if (err instanceof DelayedError) {
+            throw err;
+          }
+
           this.logger.error(err);
           throw err;
         }

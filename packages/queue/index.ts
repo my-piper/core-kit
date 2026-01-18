@@ -1,3 +1,4 @@
+export { DelayedError } from "bullmq";
 export * from "./classes";
 export * from "./consts";
 
